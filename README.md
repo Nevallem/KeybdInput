@@ -88,6 +88,6 @@ while ( true ) {
 	);
 	
 	if ( !( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
-		userin.reset();
+		userin.reset(); // request again
 }
 ```
