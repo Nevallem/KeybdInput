@@ -3,7 +3,7 @@
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 29/jan/2016
+ * @update 30/jan/2016
  * @desc Reads the keyboard input them according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
@@ -68,6 +68,10 @@ private:
 	// @param {const std::string&} Input value
 	// @param {T*} Target place
 	void set_reference( const std::string&, T * );
+
+	// Clear all values of references
+	// @param {T*} Target place
+	void clear_references( std::vector< T * > );
 public:
 	// Clipboard (arrow up or down to show the last inputs)
 	std::vector< std::string > clipboard;
@@ -110,6 +114,16 @@ void KeybdInput< T >::set_reference( const std::string& value, T *target ) {
 void KeybdInput< std::string >::set_reference( const std::string& value, std::string *target ) {
 	*target = value;
 };
+
+template < typename T >
+void KeybdInput< T >::clear_references( std::vector< T * > target ) {
+	for ( size_t i = 0; i < _references.size(); *target[ i++ ] = 0 );
+};
+
+void KeybdInput< std::string >::clear_references( std::vector< std::string * > target ) {
+	for ( size_t i = 0; i < _references.size(); *target[ i++ ] = "" );
+};
+
 
 template< typename T >
 void KeybdInput< T >::get_cursor_position() {
@@ -154,7 +168,7 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 	}
 
 	// Clear previously set values
-	for ( size_t i = 0; i < _references.size(); *_references[ i++ ] = "" );
+	clear_references( _references );
 
 	// Sets the cursor in the previous line, erase all and requires input again
 	get_cursor_position();
@@ -164,7 +178,7 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 };
 
 template< typename T >
-void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool reset_possibility, bool is_password, char sep, size_t input_max_size ) {
+void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool reset_possibility, bool is_password, char separator, size_t input_max_size ) {
 	static size_t clipboard_index = 0;
 	char letter = 0;
 	bool is_function_key = false,
@@ -190,7 +204,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		_instverify = instant_verify;
 		_reset = reset_possibility;
 		_ispw = is_password;
-		_sep = sep;
+		_sep = separator;
 		_inmaxsize = input_max_size;
 	}
 
@@ -300,7 +314,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 				if ( references.size() == 1 )
 					set_reference( input, references[ 0 ] );
 				else
-					for ( i = 0, inputParts = split( input, sep ); i < references.size(); i++ )
+					for ( i = 0, inputParts = split( input, separator ); i < references.size(); i++ )
 						if ( i < inputParts.size() )
 							set_reference( inputParts[ i ], references[ i ] );
 
