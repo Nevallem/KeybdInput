@@ -106,7 +106,7 @@ void KeybdInput< T >::erase_input( size_t erase_range = 0 ) {
 
 template < typename T >
 void KeybdInput< T >::set_reference( const std::string& value, T *target ) {
-	stringstream ss;
+	std::stringstream ss;
 	ss << value;
 	ss >> *target;
 };
@@ -178,12 +178,12 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 template< typename T >
 void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool reset_possibility, bool is_password, char separator, size_t input_max_size ) {
 	static size_t clipboard_index = 0;
-	char letter = 0;
+	size_t i, cursor_pos_x,
+		inputLength = 0;
+	char key = 0;
 	bool is_function_key = false,
 		arrow = false;
 	std::string input_subtr;
-	size_t cursor_pos_x;
-	size_t i, inputLength = 0;
 	std::vector< std::string > inputParts;
 
 	if ( references.size() == 0 ) {
@@ -219,16 +219,16 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 	}
 
 	while ( true ) {
-		letter = _getch();
+		key = _getch();
 
 		// Arrow keys prefix
-		if ( letter == -32 ) {
+		if ( key == -32 ) {
 			arrow = true;
 			continue;
 		}
 
 		// Prevents function keys
-		if ( letter == 0 ) {
+		if ( key == 0 ) {
 			is_function_key = true;
 			continue;
 		} else if ( is_function_key ) {
@@ -241,15 +241,15 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			get_cursor_position();
 
 			// LEFT
-			if ( letter == 75 && ( cursor_position[ 0 ] > request_msg.size() ) )
+			if ( key == 75 && ( cursor_position[ 0 ] > request_msg.size() ) )
 				set_cursor_position( cursor_position[ 0 ] - 1, cursor_position[ 1 ] );
 
 			// RIGHT
-			else if ( letter == 77 && cursor_position[ 0 ] < ( input.size() + request_msg.size() ) )
+			else if ( key == 77 && cursor_position[ 0 ] < ( input.size() + request_msg.size() ) )
 				set_cursor_position( cursor_position[ 0 ] + 1, cursor_position[ 1 ] );
 
 			// UP
-			else if ( letter == 72 && !is_password && clipboard.size() > 0 && clipboard_index > 0 ) {
+			else if ( key == 72 && !is_password && clipboard.size() > 0 && clipboard_index > 0 ) {
 				erase_input();
 				std::cout << clipboard[ --clipboard_index ];
 
@@ -258,7 +258,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			}
 
 			// DOWN
-			else if ( letter == 80 && !is_password && clipboard.size() > 0 && clipboard_index < clipboard.size() - 1 ) {
+			else if ( key == 80 && !is_password && clipboard.size() > 0 && clipboard_index < clipboard.size() - 1 ) {
 				erase_input();
 				std::cout << clipboard[ ++clipboard_index ];
 
@@ -272,10 +272,10 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		}
 
 		// Valid character
-		else if ( letter != 8 && letter != 13 ) {
+		else if ( key != 8 && key != 13 ) {
 			// Inserts the character in current cursor position
 			get_cursor_position();
-			input.insert( cursor_position[ 0 ] - request_msg.size(), std::string( 1, letter ) );
+			input.insert( cursor_position[ 0 ] - request_msg.size(), std::string( 1, key ) );
 
 			// If the user input satisfy the restrictions, removes the character
 			if ( instant_verify && ( input.size() > input_max_size
@@ -285,11 +285,11 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			} else {
 				// Appends the character if cursor is at the end, otherwise, interleaves
 				if ( cursor_position[ 0 ] == ( request_msg.size() + input.size() ) - 1 ) {
-					std::cout << ( ( is_password ) ? '*' : letter );
+					std::cout << ( ( is_password ) ? '*' : key );
 				} else {
 					input_subtr = input.substr( input.size() - ( ( request_msg.size() + input.size() ) - cursor_position[ 0 ] - 1 ), input.size() );
 
-					std::cout << ( ( is_password ) ? '*' : letter )
+					std::cout << ( ( is_password ) ? '*' : key )
 						<< ( ( is_password ) ? std::string( input_subtr.size(), '*' ) : input_subtr );
 					set_cursor_position( cursor_position[ 0 ] + 1, cursor_position[ 1 ] );
 				}
@@ -299,7 +299,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		}
 
 		// ENTER
-		else if ( letter == 13 && inputLength ) {
+		else if ( key == 13 && inputLength ) {
 			// If the user input satisfy the restrictions, clear input
 			if ( input.size() > input_max_size || !std::regex_match( input, restriction ) ) {
 				erase_input();
@@ -318,7 +318,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 
 				std::cout << std::endl;
 
-				// Prevents repetition
+				// Prevents repetition on clipboard and don't save if it's a password
 				if ( !is_password && ( clipboard.size() == 0 || input != clipboard[ clipboard.size() - 1 ] ) ) {
 					clipboard.push_back( input );
 					clipboard_index = clipboard.size();
@@ -329,7 +329,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		}
 
 		// BACKSPACE
-		else if ( letter == 8 && inputLength ) {
+		else if ( key == 8 && inputLength ) {
 			get_cursor_position();
 			cursor_pos_x = cursor_position[ 0 ];
 
@@ -340,6 +340,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			input.erase( cursor_pos_x - request_msg.size() - 1, 1 );
 			inputLength--;
 
+			// If the cursor isn't at the end
 			if ( cursor_pos_x <= ( request_msg.size() + input.size() ) ) {
 				// Put the cursor at the start and rewrites the input
 				set_cursor_position( short ( request_msg.size() ), cursor_position[ 1 ] );
