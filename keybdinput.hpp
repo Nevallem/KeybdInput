@@ -1,5 +1,5 @@
 /**
- * KeybdInput 1.0.1
+ * KeybdInput 1.0
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
@@ -181,7 +181,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 	char letter = 0;
 	bool is_function_key = false,
 		arrow = false;
-	string input_subtr;
+	std::string input_subtr;
 	size_t cursor_pos_x;
 	size_t i, inputLength = 0;
 	std::vector< std::string > inputParts;
