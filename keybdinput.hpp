@@ -1,5 +1,5 @@
 /**
- * KeybdInput 1.0
+ * KeybdInput 1.0.1
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
@@ -139,9 +139,7 @@ void KeybdInput< T >::get_cursor_position() {
 
 template< typename T >
 void KeybdInput< T >::set_cursor_position( short x, short y ) {
-	COORD p = { x, y };
-
-	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p ) )
+	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y } ) )
 		std::cout << "KeybdInput: an error occurred setting the console cursor position.";
 };
 
