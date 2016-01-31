@@ -86,8 +86,8 @@ while ( true ) {
 		false,
 		'/'
 	);
-	
-	if ( !( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
-		userin.reset(); // request again
+
+	if ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 ) )
+		userin.reset(); // request input again
 }
 ```
