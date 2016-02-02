@@ -3,7 +3,7 @@
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 30/jan/2016
+ * @update 02/feb/2016
  * @desc Reads the keyboard input them according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
@@ -32,17 +32,15 @@ template< typename T >
 class KeybdInput {
 private:
 	// Stores the values to be used in KeybdInput::reset()
-	std::vector< T * > _references = {};
-	std::regex _restriction;
-	std::string _rmsg = "";
-	bool _instverify = false,
-		_reset = false,
-		_ispw = false;
-	char _sep = ' ';
+	bool _instverify, _reset, _ispw;
+	char _sep;
 	size_t _inmaxsize;
+	std::regex _restriction;
+	std::string _rmsg;
+	std::vector< T * > _references = {};
 
 	// Stores the user input
-	std::string input = "";
+	std::string input;
 
 	// Receives the current X and Y cursor position from get_cursor_position()
 	std::vector< size_t > cursor_position = { 0, 0 };
@@ -106,9 +104,9 @@ void KeybdInput< T >::erase_input( size_t erase_range = 0 ) {
 
 template < typename T >
 void KeybdInput< T >::set_reference( const std::string& value, T *target ) {
-	std::stringstream ss;
-	ss << value;
-	ss >> *target;
+	std::stringstream convert;
+	convert << value;
+	convert >> *target;
 };
 
 void KeybdInput< std::string >::set_reference( const std::string& value, std::string *target ) {
@@ -124,14 +122,13 @@ void KeybdInput< std::string >::clear_references( std::vector< std::string * > t
 	for ( size_t i = 0; i < _references.size(); *target[ i++ ] = "" );
 };
 
-
 template< typename T >
 void KeybdInput< T >::get_cursor_position() {
 	CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
 	HANDLE hStd = GetStdHandle( STD_OUTPUT_HANDLE );
 
 	if ( !GetConsoleScreenBufferInfo( hStd, &screen_buffer_info ) )
-		std::cout << "KeybdInput: An error occurred getting the console cursor position.";
+		MessageBox( NULL, L"An error occurred getting the console cursor position.", L"KeybdInput ERROR", NULL );
 
 	cursor_position[ 0 ] = screen_buffer_info.dwCursorPosition.X;
 	cursor_position[ 1 ] = screen_buffer_info.dwCursorPosition.Y;
@@ -140,7 +137,7 @@ void KeybdInput< T >::get_cursor_position() {
 template< typename T >
 void KeybdInput< T >::set_cursor_position( short x, short y ) {
 	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y } ) )
-		std::cout << "KeybdInput: an error occurred setting the console cursor position.";
+		MessageBox( NULL, L"An error occurred setting the console cursor position.", L"KeybdInput ERROR", NULL );
 };
 
 template< typename T >
@@ -161,7 +158,7 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 		msg = _rmsg;
 
 	if ( !_reset ) {
-		std::cout << "KeybdInput: can't possible execute KeybdInput::reset() without set reset_possibility=true in KeybdInput::solicit()." << std::endl;
+		MessageBox( NULL, L"Can't possible execute KeybdInput::reset() without set reset_possibility=true in KeybdInput::solicit().", L"KeybdInput ERROR", NULL );
 		return;
 	}
 
@@ -182,12 +179,13 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		inputLength = 0;
 	char key = 0;
 	bool is_function_key = false,
-		arrow = false;
+		arrow = false,
+		waiting_input = true;
 	std::string input_subtr;
 	std::vector< std::string > inputParts;
 
 	if ( references.size() == 0 ) {
-		std::cerr << "KeybdInput: \"refereces\" param need be set with at least one member." << std::endl;
+		MessageBox( NULL, L"\"refereces\" param need be set with at least one member.", L"KeybdInput ERROR", NULL );
 		return;
 	}
 
@@ -218,7 +216,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		_inmaxsize = 0;
 	}
 
-	while ( true ) {
+	while ( waiting_input ) {
 		key = _getch();
 
 		// Arrow keys prefix
@@ -241,11 +239,11 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			get_cursor_position();
 
 			// LEFT
-			if ( key == 75 && ( cursor_position[ 0 ] > request_msg.size() ) )
+			if ( key == 75 && cursor_position[ 0 ] > request_msg.size() )
 				set_cursor_position( cursor_position[ 0 ] - 1, cursor_position[ 1 ] );
 
 			// RIGHT
-			else if ( key == 77 && cursor_position[ 0 ] < ( input.size() + request_msg.size() ) )
+			else if ( key == 77 && cursor_position[ 0 ] < input.size() + request_msg.size() )
 				set_cursor_position( cursor_position[ 0 ] + 1, cursor_position[ 1 ] );
 
 			// UP
@@ -278,13 +276,11 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			input.insert( cursor_position[ 0 ] - request_msg.size(), std::string( 1, key ) );
 
 			// If the user input satisfy the restrictions, removes the character
-			if ( instant_verify && ( input.size() > input_max_size
-				|| !std::regex_match( input, restriction )
-			) ) {
+			if ( instant_verify && ( input.size() > input_max_size || !std::regex_match( input, restriction ) ) ) {
 				input.erase( cursor_position[ 0 ] - request_msg.size(), 1 );
 			} else {
 				// Appends the character if cursor is at the end, otherwise, interleaves
-				if ( cursor_position[ 0 ] == ( request_msg.size() + input.size() ) - 1 ) {
+				if ( cursor_position[ 0 ] == ( request_msg.size() + input.size() - 1 ) ) {
 					std::cout << ( ( is_password ) ? '*' : key );
 				} else {
 					input_subtr = input.substr( input.size() - ( ( request_msg.size() + input.size() ) - cursor_position[ 0 ] - 1 ), input.size() );
@@ -324,7 +320,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 					clipboard_index = clipboard.size();
 				}
 
-				break;
+				waiting_input = false;
 			}
 		}
 
