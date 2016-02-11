@@ -1,5 +1,5 @@
 /**
- * KeybdInput 1.0.2
+ * KeybdInput 1.0.3
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
@@ -42,7 +42,7 @@ private:
 	std::string input;
 
 	// Receives the current X and Y cursor position from get_cursor_position()
-	std::vector< size_t > cursor_position = { 0, 0 };
+	std::vector< short > cursor_position = { 0, 0 };
 
 	// Erase the input of user
 	// @param {size_t=input.size()} Erase range
@@ -53,8 +53,8 @@ private:
 
 	// Set the console cursor position
 	// @param {short} X position of cursor
-	// @param {short} Y position of cursor
-	void set_cursor_position( short, short );
+	// @param {short=cursor_position[ 1 ]} Y position of cursor
+	void set_cursor_position( short, short = 0 );
 
 	// Split a string
 	// @param {std::string} Target string
@@ -134,8 +134,8 @@ void KeybdInput< T >::get_cursor_position() {
 };
 
 template< typename T >
-void KeybdInput< T >::set_cursor_position( short x, short y ) {
-	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y } ) )
+void KeybdInput< T >::set_cursor_position( short x, short y = 0 ) {
+	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y ? y : cursor_position[ 1 ] } ) )
 		MessageBox( NULL, L"An error occurred setting the console cursor position.", L"KeybdInput ERROR", NULL );
 };
 
@@ -170,7 +170,7 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 
 	// Sets the cursor in the previous line, erase all and requires input again
 	get_cursor_position();
-	set_cursor_position( short ( msg.size() + input.size() ), cursor_position[ 1 ] - 1 );
+	set_cursor_position( static_cast< short >( msg.size() + input.size() ), cursor_position[ 1 ] - 1 );
 	erase_input( msg.size() + input.size() );
 	solicit( msg, std::regex( _restriction ), _references, _instverify, _reset, _ispw, _sep, _inmaxsize );
 };
@@ -242,12 +242,12 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			get_cursor_position();
 
 			// LEFT
-			if ( key == 75 && cursor_position[ 0 ] > request_msg.size() )
-				set_cursor_position( cursor_position[ 0 ] - 1, cursor_position[ 1 ] );
+			if ( key == 75 && static_cast< size_t >( cursor_position[ 0 ] ) > request_msg.size() )
+				set_cursor_position( cursor_position[ 0 ] - 1 );
 
 			// RIGHT
-			else if ( key == 77 && cursor_position[ 0 ] < input.size() + request_msg.size() )
-				set_cursor_position( cursor_position[ 0 ] + 1, cursor_position[ 1 ] );
+			else if ( key == 77 && static_cast< size_t >( cursor_position[ 0 ] ) < input.size() + request_msg.size() )
+				set_cursor_position( cursor_position[ 0 ] + 1 );
 
 			// UP
 			else if ( key == 72 && !is_password && clipboard.size() > 0 && clipboard_index > 0 ) {
@@ -290,7 +290,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 
 					std::cout << ( ( is_password ) ? '*' : key )
 						<< ( ( is_password ) ? std::string( input_subtr.size(), '*' ) : input_subtr );
-					set_cursor_position( cursor_position[ 0 ] + 1, cursor_position[ 1 ] );
+					set_cursor_position( cursor_position[ 0 ] + 1 );
 				}
 
 				inputLength++;
@@ -342,15 +342,15 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			// If the cursor isn't at the end
 			if ( cursor_pos_x <= ( request_msg.size() + input.size() ) ) {
 				// Put the cursor at the start and rewrites the input
-				set_cursor_position( short ( request_msg.size() ), cursor_position[ 1 ] );
+				set_cursor_position( static_cast< short >( request_msg.size() ) );
 				std::cout << ( ( is_password ) ? std::string( input.size(), '*' ) : input );
 
 				// Put the cursor at the end and erase the last char
-				set_cursor_position( short ( request_msg.size() + input.size() + 1 ), cursor_position[ 1 ] );
+				set_cursor_position( static_cast< short >( request_msg.size() + input.size() + 1 ) );
 				std::cout << "\b \b";
 
 				// Put the cursor at the original position
-				set_cursor_position( short ( cursor_pos_x - 1 ), cursor_position[ 1 ] );
+				set_cursor_position( static_cast< short >( cursor_pos_x - 1 ) );
 			}
 		}
 
