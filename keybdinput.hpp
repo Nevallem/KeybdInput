@@ -16,7 +16,7 @@
 		false,
 		false,
 		false,
-		'/'
+		"/"
 	);
 */
 
@@ -53,7 +53,7 @@ private:
 
 	// Set the console cursor position
 	// @param {short} X position of cursor
-	// @param {short=cursor_position[ 1 ]} Y position of cursor
+	// @param [{short=cursor_position[ 1 ]}] Y position of cursor
 	void set_cursor_position( short, short = 0 );
 
 	// Split a string
