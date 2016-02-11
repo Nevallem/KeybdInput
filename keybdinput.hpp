@@ -58,8 +58,8 @@ private:
 
 	// Split a string
 	// @param {std::string} Target string
-	// @param {std::string} Separator
-	std::vector< std::string > splitstr( std::string str, std::string separator );
+	// @param [{std::string=""}] Separator
+	std::vector< std::string > splitstr( std::string str, std::string separator = "" );
 
 	// Set the reference with input value
 	// @param {const std::string&} Input value
