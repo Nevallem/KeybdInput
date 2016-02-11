@@ -3,7 +3,7 @@
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 02/feb/2016
+ * @update 11/feb/2016
  * @desc Reads the keyboard input them according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
@@ -33,10 +33,9 @@ class KeybdInput {
 private:
 	// Stores the values to be used in KeybdInput::reset()
 	bool _instverify, _reset, _ispw;
-	char _sep;
 	size_t _inmaxsize;
 	std::regex _restriction;
-	std::string _rmsg;
+	std::string _rmsg, _sep;
 	std::vector< T * > _references = {};
 
 	// Stores the user input
@@ -59,8 +58,8 @@ private:
 
 	// Split a string
 	// @param {std::string} Target string
-	// @param {char} Delimiter
-	std::vector< std::string > split( std::string str, char delim );
+	// @param {std::string} Separator
+	std::vector< std::string > splitstr( std::string str, std::string separator );
 
 	// Set the reference with input value
 	// @param {const std::string&} Input value
@@ -87,7 +86,7 @@ public:
 	// @param {bool=false} Is password
 	// @param {char=' '} Separator
 	// @param {size_t=1000} Input size
-	void solicit( std::string, std::regex, std::vector< T * >, bool = false, bool = false, bool = false, char = ' ', size_t = 1000 );
+	void solicit( std::string, std::regex, std::vector< T * >, bool = false, bool = false, bool = false, std::string = " ", size_t = 1000 );
 };
 
 template< typename T >
@@ -141,12 +140,16 @@ void KeybdInput< T >::set_cursor_position( short x, short y ) {
 };
 
 template< typename T >
-std::vector< std::string > KeybdInput< T >::split( std::string str, char delim ) {
+std::vector< std::string > KeybdInput< T >::splitstr( std::string str, std::string separator = "" ) {
+	size_t index;
 	std::vector< std::string > elems;
-	std::stringstream stream( str );
-	std::string item;
 
-	for ( ; getline( stream, item, delim ); elems.push_back( item ) );
+	while ( ( index = str.find( separator ) ) != std::string::npos && str.size() > 1 ) {
+		elems.push_back( str.substr( 0, index ? index : 1 ) );
+		str.erase( 0, index + ( !separator.size() ? 1 : separator.size() ) );
+	}
+
+	elems.push_back( str );
 
 	return elems;
 };
@@ -173,7 +176,7 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 };
 
 template< typename T >
-void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool reset_possibility, bool is_password, char separator, size_t input_max_size ) {
+void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool reset_possibility, bool is_password, std::string separator, size_t input_max_size ) {
 	static size_t clipboard_index = 0;
 	size_t i, cursor_pos_x,
 		inputLength = 0;
@@ -308,7 +311,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 				if ( references.size() == 1 )
 					set_reference( input, references[ 0 ] );
 				else
-					for ( i = 0, inputParts = split( input, separator ); i < references.size(); i++ )
+					for ( i = 0, inputParts = splitstr( input, separator ); i < references.size(); i++ )
 						if ( i < inputParts.size() )
 							set_reference( inputParts[ i ], references[ i ] );
 
