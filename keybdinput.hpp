@@ -1,5 +1,5 @@
 /**
- * KeybdInput 1.0.1
+ * KeybdInput 1.0.2
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
