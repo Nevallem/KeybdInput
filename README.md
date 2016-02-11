@@ -17,7 +17,7 @@ Requires the keyboard input. This method takes 8 arguments, 4 optional.
 - **instant_verify (bool=false)**: if the restriction will be verified immediately or just after press ENTER.
 - **reset_possibility (bool=false)**: if there is reset possibility (see KeybdInput::reset()).
 - **is_password (bool=false)**: if is a password input.
-- **separator (char=' ')**: separator character.
+- **separator (std::string=" ")**: separator character.
 - **input_max_size (size_t=1000)**: max size of input.
 
 #### Examples
@@ -56,7 +56,7 @@ userin.solicit(
 	false, // only verify restriction after ENTER
 	false, // not reset possibility
 	false, // no is a password
-	'/' // separator
+	"/" // separator
 );
 
 std::cout << "day = " << day << "; month = " << month << "; year = " << year << std::endl;
@@ -84,7 +84,7 @@ while ( true ) {
 		false,
 		true, // now, reset_possibility argument need be set as true
 		false,
-		'/'
+		"/"
 	);
 
 	if ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 ) )
