@@ -45,7 +45,7 @@ private:
 	std::vector< short > cursor_position = { 0, 0 };
 
 	// Erase the input of user
-	// @param {size_t=input.size()} Erase range
+	// @param [{size_t=input.size()}] Erase range
 	void erase_input( size_t = 0 );
 
 	// Get the console cursor position and pass to the cursor_position
@@ -81,11 +81,11 @@ public:
 	// @param {string} Request message
 	// @param {regex} The regex
 	// @param {vector< T * >} The place(s) where it will be stored the input
-	// @param {bool=false} Instant verify
-	// @param {bool=false} Reset possibility
-	// @param {bool=false} Is password
-	// @param {char=' '} Separator
-	// @param {size_t=1000} Input size
+	// @param [{bool=false}] Instant verify
+	// @param [{bool=false}] Reset possibility
+	// @param [{bool=false}] Is password
+	// @param [{std::string=" "}] Separator
+	// @param [{size_t=1000}] Input size
 	void solicit( std::string, std::regex, std::vector< T * >, bool = false, bool = false, bool = false, std::string = " ", size_t = 1000 );
 };
 
@@ -215,8 +215,8 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 		_instverify = false;
 		_reset = false;
 		_ispw = false;
-		_sep = ' ';
-		_inmaxsize = 0;
+		_sep = " ";
+		_inmaxsize = 1000;
 	}
 
 	while ( waiting_input ) {
