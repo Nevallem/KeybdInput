@@ -73,7 +73,7 @@ Requires the user input again. This method takes 1 optional argument.
 - **request_msg (std::string=request_msg)**: message that will be displayed requesting the user input.
 
 #### Example
-In some situation, you can need request the user to input again. Take for example the code above: if the input was 29/02/2001? 2001 isn't a bissext year, so you can do this:
+In some situation, you can need request the user to input again. Take for example the code above: if the input was 29/02/2001? 2001 isn't a bissext year, so, you could do this to solve:
 
 ```cpp
 while ( true ) {
