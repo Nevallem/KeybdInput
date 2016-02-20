@@ -3,7 +3,7 @@
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 11/feb/2016
+ * @update 19/feb/2016
  * @desc Reads the keyboard input them according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
@@ -135,7 +135,7 @@ void KeybdInput< T >::get_cursor_position() {
 
 template< typename T >
 void KeybdInput< T >::set_cursor_position( short x, short y = 0 ) {
-	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y ? y : cursor_position[ 1 ] } ) )
+	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y } ) )
 		MessageBox( NULL, L"An error occurred setting the console cursor position.", L"KeybdInput ERROR", NULL );
 };
 
