@@ -1,23 +1,27 @@
 /**
- * KeybdInput 1.0.3
+ * KeybdInput 1.0.4
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 19/feb/2016
+ * @update 20/feb/2016
  * @desc Reads the keyboard input them according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
 	KeybdInput< int > userin;
 
 	userin.solicit(
-		"Type a date (btw 01/01/1900 and 31/12/2009): ",
-		std::regex( "([0-2]?[0-9]|3[0-1])/(0?[1-9]|1[012])/(19[0-9]{2}|200[0-9])" ),
+		"Type a valid date (formatted as dd/mm/yyyy): ",
+		std::regex( "([0-2]?[0-9]|3[0-1])/(0?[1-9]|1[012])/([0-9]{4})" ),
 		{ &day, &month, &year },
-		false,
 		false,
 		false,
 		"/"
 	);
+
+	while ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
+		||  day == 31 && ( month == 4 || month == 6 || month == 9 || month == 11 )
+	)
+		userin.reset();
 */
 
 #pragma once
@@ -32,7 +36,7 @@ template< typename T >
 class KeybdInput {
 private:
 	// Stores the values to be used in KeybdInput::reset()
-	bool _instverify, _reset, _ispw;
+	bool _instverify, _ispw;
 	size_t _inmaxsize;
 	std::regex _restriction;
 	std::string _rmsg, _sep;
@@ -82,11 +86,10 @@ public:
 	// @param {regex} The regex
 	// @param {vector< T * >} The place(s) where it will be stored the input
 	// @param [{bool=false}] Instant verify
-	// @param [{bool=false}] Reset possibility
 	// @param [{bool=false}] Is password
 	// @param [{std::string=" "}] Separator
 	// @param [{size_t=1000}] Input size
-	void solicit( std::string, std::regex, std::vector< T * >, bool = false, bool = false, bool = false, std::string = " ", size_t = 1000 );
+	void solicit( std::string, std::regex, std::vector< T * >, bool = false, bool = false, std::string = " ", size_t = 1000 );
 };
 
 template< typename T >
@@ -160,11 +163,6 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 	if ( msg == "" && _rmsg != "" )
 		msg = _rmsg;
 
-	if ( !_reset ) {
-		MessageBox( NULL, L"Can't possible execute KeybdInput::reset() without set reset_possibility=true in KeybdInput::solicit().", L"KeybdInput ERROR", NULL );
-		return;
-	}
-
 	// Clear previously set values
 	clear_references( _references );
 
@@ -172,11 +170,11 @@ void KeybdInput< T >::reset( std::string msg = "" ) {
 	get_cursor_position();
 	set_cursor_position( static_cast< short >( msg.size() + input.size() ), cursor_position[ 1 ] - 1 );
 	erase_input( msg.size() + input.size() );
-	solicit( msg, std::regex( _restriction ), _references, _instverify, _reset, _ispw, _sep, _inmaxsize );
+	solicit( msg, std::regex( _restriction ), _references, _instverify, _ispw, _sep, _inmaxsize );
 };
 
 template< typename T >
-void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool reset_possibility, bool is_password, std::string separator, size_t input_max_size ) {
+void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, std::vector< T * > references, bool instant_verify, bool is_password, std::string separator, size_t input_max_size ) {
 	static size_t clipboard_index = 0;
 	size_t i, cursor_pos_x,
 		inputLength = 0;
@@ -196,28 +194,13 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 	std::cout << request_msg;
 
 	// Retrieves the values to be used in KeybdInput::reset()
-	if ( reset_possibility ) {
-		_rmsg = request_msg;
-		_restriction = restriction;
-		_references = references;
-		_instverify = instant_verify;
-		_reset = reset_possibility;
-		_ispw = is_password;
-		_sep = separator;
-		_inmaxsize = input_max_size;
-	}
-
-	// Clears previous data
-	else if ( _reset ) {
-		_rmsg = "";
-		_restriction = "";
-		_references = {};
-		_instverify = false;
-		_reset = false;
-		_ispw = false;
-		_sep = " ";
-		_inmaxsize = 1000;
-	}
+	_rmsg = request_msg;
+	_restriction = restriction;
+	_references = references;
+	_instverify = instant_verify;
+	_ispw = is_password;
+	_sep = separator;
+	_inmaxsize = input_max_size;
 
 	while ( waiting_input ) {
 		key = _getch();
