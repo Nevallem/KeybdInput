@@ -15,7 +15,6 @@ Requires the keyboard input. This method takes 8 arguments, 4 optional.
 - **restriction (std::regex)**: regex that will be used to specify the formatting of input.
 - **references (std::vector< T * >)**: the place(s) where it will be stored the input.
 - **instant_verify (bool=false)**: if the restriction will be verified immediately or just after press ENTER.
-- **reset_possibility (bool=false)**: if there is reset possibility (see KeybdInput::reset()).
 - **is_password (bool=false)**: if is a password input.
 - **separator (std::string=" ")**: separator character.
 - **input_max_size (size_t=1000)**: max size of input.
@@ -54,7 +53,6 @@ userin.solicit(
 	std::regex( "([0-2]?[0-9]|3[0-1])/(0?[1-9]|1[012])/([0-9]{4})" ), // formatting, reads any date
 	{ &day, &month, &year },
 	false, // only verify restriction after ENTER
-	false, // not reset possibility
 	false, // no is a password
 	"/" // separator
 );
@@ -73,7 +71,7 @@ Requires the user input again. This method takes 1 optional argument.
 - **request_msg (std::string=request_msg)**: message that will be displayed requesting the user input.
 
 #### Example
-In some situation, you can need request the user to input again. Take for example the code above: if the input was 29/02/2001? 2001 isn't a bissext year, so, you could do this to solve:
+In some situation, you can need request the user to input again. Take for example the code above: if the input was 29/02/2001? Or 31/11/2015? 2001 isn't a bissext year and november don't have 31 days, so, you could do this to solve:
 
 ```cpp
 while ( true ) {
@@ -82,12 +80,13 @@ while ( true ) {
 		std::regex( "([0-2]?[0-9]|3[0-1])/(0?[1-9]|1[012])/([0-9]{4})" ),
 		{ &day, &month, &year },
 		false,
-		true, // now, reset_possibility argument need be set as true
 		false,
 		"/"
 	);
 
-	if ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 ) )
-		userin.reset(); // request input again
+	while ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
+		||  day == 31 && ( month == 4 || month == 6 || month == 9 || month == 11 )
+	)
+		userin.reset(); // request user input again
 }
 ```
