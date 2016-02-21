@@ -71,7 +71,7 @@ Requires the user input again. This method takes 1 optional argument.
 - **request_msg (std::string=request_msg)**: message that will be displayed requesting the user input.
 
 #### Example
-In some situation, you can need request the user input again. Take for example the code above: if the input was 29/02/2001? Or 31/11/2015? 2001 isn't a bissext year and november don't have 31 days, so, you could do this to solve:
+In some situation, you can need request the user input again. Take for example the code above: if the input was 29/02/2001? Or 31/11/2015? 2001 isn't a bissext year and november don't have 31 days. So, you could do something like this to solve:
 
 ```cpp
 userin.solicit(
