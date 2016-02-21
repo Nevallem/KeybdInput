@@ -74,19 +74,17 @@ Requires the user input again. This method takes 1 optional argument.
 In some situation, you can need request the user to input again. Take for example the code above: if the input was 29/02/2001? Or 31/11/2015? 2001 isn't a bissext year and november don't have 31 days, so, you could do this to solve:
 
 ```cpp
-while ( true ) {
-	userin.solicit(
-		"Type a valid date (formatted as dd/mm/yyyy): ",
-		std::regex( "([0-2]?[0-9]|3[0-1])/(0?[1-9]|1[012])/([0-9]{4})" ),
-		{ &day, &month, &year },
-		false,
-		false,
-		"/"
-	);
+userin.solicit(
+	"Type a valid date (formatted as dd/mm/yyyy): ",
+	std::regex( "([0-2]?[0-9]|3[0-1])/(0?[1-9]|1[012])/([0-9]{4})" ),
+	{ &day, &month, &year },
+	false,
+	false,
+	"/"
+);
 
-	while ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
-		||  day == 31 && ( month == 4 || month == 6 || month == 9 || month == 11 )
-	)
-		userin.reset(); // request user input again
-}
+while ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
+	||  day == 31 && ( month == 4 || month == 6 || month == 9 || month == 11 )
+)
+	userin.reset(); // request user input again
 ```
