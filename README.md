@@ -8,6 +8,8 @@ First, instantiate the KeybdInput class with a type passed through template.
 KeybdInput< std::string > userin; // for example
 ```
 
+PS: it's essential prior knowledge of regular expressions (regex) to properly use the library.
+
 ### KeybdInput::solicit()
 Requires the keyboard input. This method takes 8 arguments, 4 optional.
 
