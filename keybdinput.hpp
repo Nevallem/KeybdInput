@@ -3,7 +3,7 @@
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 27/apr/2016
+ * @update 17/jun/2016
  * @desc Reads the keyboard input them according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
@@ -152,7 +152,7 @@ void KeybdInput< T >::get_cursor_position() {
 	HANDLE hStd = GetStdHandle( STD_OUTPUT_HANDLE );
 
 	if ( !GetConsoleScreenBufferInfo( hStd, &screen_buffer_info ) )
-		MessageBox( NULL, ( LPCSTR ) "An error occurred getting the console cursor position.", ( LPCSTR ) "KeybdInput ERROR", NULL );
+		MessageBoxA( NULL, "An error occurred getting the console cursor position.", "KeybdInput ERROR", NULL );
 
 	cursor_position[ 0 ] = screen_buffer_info.dwCursorPosition.X;
 	cursor_position[ 1 ] = screen_buffer_info.dwCursorPosition.Y;
@@ -161,7 +161,7 @@ void KeybdInput< T >::get_cursor_position() {
 template< typename T >
 void KeybdInput< T >::set_cursor_position( short x, short y = 0 ) {
 	if ( !SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), { x, y } ) )
-		MessageBox( NULL, ( LPCSTR ) "An error occurred setting the console cursor position.", ( LPCSTR ) "KeybdInput ERROR", NULL );
+		MessageBoxA( NULL, "An error occurred setting the console cursor position.", "KeybdInput ERROR", NULL );
 };
 
 template< typename T >
@@ -222,7 +222,7 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 	std::vector< std::string > input_parts;
 
 	if ( references.size() == 0 ) {
-		MessageBox( NULL, ( LPCSTR ) "\"refereces\" param need be set with at least one member.", ( LPCSTR ) "KeybdInput ERROR", NULL );
+		MessageBoxA( NULL, "\"refereces\" param need be set with at least one member.", "KeybdInput ERROR", NULL );
 		return;
 	}
 
