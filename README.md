@@ -36,7 +36,7 @@ userin.solicit( "Type something: ", std::regex( "^.+$" ), { &cmd2 } );
 
 In the example above, is_password is set by default as "false", but it's values is changed to "true" before the fist call of method. However, in the second call, is_password it's already with the default value ("false").
 
-PS: it's essential prior knowledge of regular expressions (regex) to properly use the library.
+PS: it's essential prior knowledge of regular expressions (regex) to properly use this library.
 
 ### KeybdInput::solicit()
 Requires the keyboard input. This method takes 3 arguments.
