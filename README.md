@@ -109,8 +109,9 @@ userin.solicit(
 	{ &day, &month, &year }
 );
 
-while ( ( day >= 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
-	||  day == 31 && ( month == 4 || month == 6 || month == 9 || month == 11 )
+while ( ( day == 29 && month == 2 ) && !( ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0 )
+	|| day == 31 && ( month == 4 || month == 6 || month == 9 || month == 11 )
+	|| day > 29 && month == 2
 )
 	userin.requires_again();
 	
