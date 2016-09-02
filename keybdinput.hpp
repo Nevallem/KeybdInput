@@ -48,7 +48,7 @@ private:
 	std::string separator_default = " ";
 	size_t input_max_size_default = 1000;
 
-	// Control of retrieve values (see KeybdInput::requires_again()) 
+	// Control of retrieve values (see KeybdInput::requires_again())
 	bool retrieved_values = false;
 
 	// Stores the user input
@@ -80,7 +80,7 @@ private:
 	// @param {const std::string&} Input value
 	// @param {T*} Target place
 	void set_reference( const std::string&, T * );
-	
+
 	// Clear all values of references
 	// @param {T*} Target place
 	void clear_references( std::vector< T * > );
@@ -201,7 +201,7 @@ void KeybdInput< T >::requires_again( std::string msg = "" ) {
 	clear_input = clear_input_copy;
 	separator = separator_copy;
 	input_max_size = input_max_size_copy;
-	
+
 	// Sets the cursor in the previous line, clear all (if is set) and requires input again
 	get_cursor_position();
 	set_cursor_position( static_cast< short >( msg.size() + input.size() ), cursor_position[ 1 ] - 1 );
