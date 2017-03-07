@@ -1,5 +1,4 @@
 # KeybdInput
-Reads the keyboard input them according to the format specified (only works on Windows).
 
 ## How to use
 First, instantiate the KeybdInput class with a type passed through template.

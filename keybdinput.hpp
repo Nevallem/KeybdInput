@@ -3,8 +3,8 @@
  *
  * @author Roger Lima (rogerlima@outlook.com)
  * @date 31/aug/2014
- * @update 01/sep/2016
- * @desc Reads the keyboard input them according to the format specified (only works on Windows)
+ * @update 07/mar/2017
+ * @desc Reads the keyboard input according to the format specified (only works on Windows)
  * @example
 	int day, month, year;
 	KeybdInput< int > userin;
@@ -63,7 +63,7 @@ private:
 	// @param [{bool=false}] Is reset
 	void input_back( size_t = NULL, bool = false, bool = false );
 
-	// Get the console cursor position and pass to the cursor_position
+	// Get the console cursor position and pass to cursor_position
 	void get_cursor_position();
 
 	// Set the console cursor position
@@ -103,7 +103,6 @@ public:
 	// @param {string} Request message
 	// @param {regex} The regex
 	// @param {vector< T * >} The place(s) where it will be stored the input
-	// @param [{bool=false}] Is reset (for internal use)
 	void solicit( std::string, std::regex, std::vector< T * > );
 
 	// Constructor
@@ -269,6 +268,10 @@ void KeybdInput< T >::solicit( std::string request_msg, std::regex restriction, 
 			is_function_key = false;
 			continue;
 		}
+
+		// Prevents the use of right mouse button and CTRL key
+		if ( ( GetKeyState( VK_RBUTTON ) & 0x80 ) != 0 || ( GetKeyState( VK_CONTROL ) & 0x80 ) != 0 )
+			continue;
 
 		// Arrows
 		if ( arrow ) {
